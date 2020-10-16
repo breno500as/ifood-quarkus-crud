@@ -1,0 +1,101 @@
+package com.ifood.quarkus.crud.api;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.transaction.Transactional;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+
+import com.ifood.quarkus.crud.dto.AdicionarPratoDTO;
+import com.ifood.quarkus.crud.dto.AtualizarPratoDTO;
+import com.ifood.quarkus.crud.entity.Prato;
+import com.ifood.quarkus.crud.entity.Restaurante;
+
+@Path("restaurantes/{idRestaurante}/pratos")
+public class PratoAPI {
+
+	@GET
+	public List<AdicionarPratoDTO> buscarPratos(@PathParam("idRestaurante") Long idRestaurante) {
+		Optional<Restaurante> restauranteOp = Restaurante.findByIdOptional(idRestaurante);
+		if (restauranteOp.isEmpty()) {
+			throw new NotFoundException("Restaurante não existe");
+		}
+		Stream<Prato> pratos = Prato.stream("restaurante", restauranteOp.get());
+		return Collections.emptyList();// pratos.map(p -> pratoMapper.toDTO(p)).collect(Collectors.toList());
+	}
+
+	@POST
+	@Transactional
+	@Tag(name = "prato")
+	public Response adicionarPrato(@PathParam("idRestaurante") Long idRestaurante, AdicionarPratoDTO dto) {
+		Optional<Restaurante> restauranteOp = Restaurante.findByIdOptional(idRestaurante);
+		if (restauranteOp.isEmpty()) {
+			throw new NotFoundException("Restaurante não existe");
+		}
+		// //Utilizando dto, recebi detached entity passed to persist:
+		// Prato prato = new Prato();
+		// prato.nome = dto.nome;
+		// prato.descricao = dto.descricao;
+		//
+		// prato.preco = dto.preco;
+		// prato.restaurante = restauranteOp.get();
+		// prato.persist();
+
+		Prato prato = null;// pratoMapper.toPrato(dto);
+		prato.restaurante = restauranteOp.get();
+		prato.persist();
+		return Response.status(Status.CREATED).build();
+	}
+
+	@PUT
+	@Path("{id}")
+	@Transactional
+	@Tag(name = "prato")
+	public void atualizar(@PathParam("idRestaurante") Long idRestaurante, @PathParam("id") Long id,
+			AtualizarPratoDTO dto) {
+		Optional<Restaurante> restauranteOp = Restaurante.findByIdOptional(idRestaurante);
+		if (restauranteOp.isEmpty()) {
+			throw new NotFoundException("Restaurante não existe");
+		}
+
+		// No nosso caso, id do prato vai ser único, independente do restaurante...
+		Optional<Prato> pratoOp = Prato.findByIdOptional(id);
+
+		if (pratoOp.isEmpty()) {
+			throw new NotFoundException("Prato não existe");
+		}
+		Prato prato = pratoOp.get();
+		// pratoMapper.toPrato(dto, prato);
+		prato.persist();
+	}
+
+	@DELETE
+	@Path("{id}")
+	@Transactional
+	@Tag(name = "prato")
+	public void delete(@PathParam("idRestaurante") Long idRestaurante, @PathParam("id") Long id) {
+		Optional<Restaurante> restauranteOp = Restaurante.findByIdOptional(idRestaurante);
+		if (restauranteOp.isEmpty()) {
+			throw new NotFoundException("Restaurante não existe");
+		}
+
+		Optional<Prato> pratoOp = Prato.findByIdOptional(id);
+
+		pratoOp.ifPresentOrElse(Prato::delete, () -> {
+			throw new NotFoundException();
+		});
+	}
+
+}
