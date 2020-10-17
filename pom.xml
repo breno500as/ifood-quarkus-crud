@@ -97,6 +97,10 @@
 			<version>1.14.3</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-smallrye-jwt</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>com.github.database-rider</groupId>
