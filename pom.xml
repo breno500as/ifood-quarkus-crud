@@ -35,6 +35,14 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-smallrye-opentracing</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.opentracing.contrib</groupId>
+			<artifactId>opentracing-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-smallrye-openapi</artifactId>
 		</dependency>
 		<dependency>
