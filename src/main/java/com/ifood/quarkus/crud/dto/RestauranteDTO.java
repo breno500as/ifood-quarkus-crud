@@ -8,7 +8,7 @@ public class RestauranteDTO {
 
 	public String cnpj;
 
-	public String nomeFantasia;
+	public String nome;
 
 	public LocalizacaoDTO localizacao;
 

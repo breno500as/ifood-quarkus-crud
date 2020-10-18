@@ -16,7 +16,7 @@ public class AdicionarRestauranteDTO implements DTO {
 	public String cnpj;
 
 	@Size(min = 3, max = 30)
-	public String nomeFantasia;
+	public String nome;
 
 	public LocalizacaoDTO localizacao;
 

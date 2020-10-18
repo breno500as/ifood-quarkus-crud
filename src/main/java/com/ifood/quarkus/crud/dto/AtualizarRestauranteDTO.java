@@ -5,6 +5,6 @@ import javax.validation.constraints.NotNull;
 public class AtualizarRestauranteDTO {
 	
 	@NotNull
-	public String nomeFantasia;
+	public String nome;
 
 }
