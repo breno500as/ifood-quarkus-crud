@@ -21,6 +21,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.SimplyTimed;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import com.ifood.quarkus.crud.dto.AdicionarPratoDTO;
@@ -40,6 +43,10 @@ public class PratoAPI {
 	PratoMapper pratoMapper;
 
 	@GET
+	@Counted(name = "Número de chamadas buscarPratos") // Conta quantas vezes o método foi chamado
+	@SimplyTimed(name = "Tempo simples para executar buscarPratos")// Mostra o tempo simples do método
+	@Timed(name = "Tempo total para executar buscarPratos")// Mostra o tempo total do método
+	//@Gauge Pega informações de recursos, quantidade de memória, espaço em disco, temperatura do processador, número de elementos em uma fila, número de elementos em uma tabela
 	public List<PratoDTO> buscarPratos(@PathParam("idRestaurante") Long idRestaurante) {
 		Optional<Restaurante> restauranteOp = Restaurante.findByIdOptional(idRestaurante);
 		if (restauranteOp.isEmpty()) {
