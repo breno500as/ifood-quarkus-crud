@@ -19,6 +19,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -30,6 +32,8 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirements;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import com.ifood.quarkus.crud.dto.AdicionarRestauranteDTO;
 import com.ifood.quarkus.crud.dto.AtualizarRestauranteDTO;
@@ -43,14 +47,16 @@ import com.ifood.quarkus.crud.exception.ConstraintViolationResponse;
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "restaurantes")
 @RolesAllowed("proprietario")
-@SecurityScheme(securitySchemeName = "ifood-oauth", 
-                type = SecuritySchemeType.OAUTH2, 
-                flows = @OAuthFlows(password = @OAuthFlow(tokenUrl = "http://localhost:8180/auth/realms/ifood/protocol/openid-connect/token")))
-@SecurityRequirements(value = {@SecurityRequirement(name = "ifood-oauth", scopes = {})})
+@SecurityScheme(securitySchemeName = "ifood-oauth", type = SecuritySchemeType.OAUTH2, flows = @OAuthFlows(password = @OAuthFlow(tokenUrl = "http://localhost:8180/auth/realms/ifood/protocol/openid-connect/token")))
+@SecurityRequirements(value = { @SecurityRequirement(name = "ifood-oauth", scopes = {}) })
 public class RestauranteAPI {
 
 	@Inject
 	private RestauranteMapper restauranteMapper;
+
+	@Inject
+	@Channel("restaurantes")
+	Emitter<Restaurante> emitter;
 
 	@GET
 	public List<RestauranteDTO> listAll() {
@@ -61,16 +67,20 @@ public class RestauranteAPI {
 	@POST
 	@Transactional
 	@APIResponse(responseCode = "201", description = "Caso restaurante seja cadastrado com sucesso")
-    @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ConstraintViolationResponse.class)))
-	public void cria(@Valid AdicionarRestauranteDTO restauranteDTO) {
+	@APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ConstraintViolationResponse.class)))
+	public Response cria(@Valid AdicionarRestauranteDTO restauranteDTO) {
 		Restaurante r = this.restauranteMapper.toRestaurante(restauranteDTO);
 		r.persist();
+
+		emitter.send(r);
+
+		return Response.status(Status.CREATED).build();
 	}
 
 	@PUT
 	@Path("{id}")
 	@Transactional
-	public void atualiza(@PathParam("id") Long id, @Valid AtualizarRestauranteDTO dto) {
+	public Response atualiza(@PathParam("id") Long id, @Valid AtualizarRestauranteDTO dto) {
 		Optional<Restaurante> restauranteOp = Restaurante.findByIdOptional(id);
 		if (restauranteOp.isEmpty()) {
 			throw new NotFoundException();
@@ -85,18 +95,21 @@ public class RestauranteAPI {
 		restauranteMapper.toRestaurante(dto, restaurante);
 
 		restaurante.persist();
+		
+		 return Response.ok().build();
 	}
 
 	@DELETE
 	@Path("{id}")
 	@Transactional
-	public void delete(@PathParam("id") Long id) {
+	public Response delete(@PathParam("id") Long id) {
 		Optional<Restaurante> optional = Restaurante.findByIdOptional(id);
 
 		optional.ifPresentOrElse(Restaurante::delete, () -> {
 			throw new NotFoundException();
 		});
 
+		return Response.noContent().build();
 	}
 
 }

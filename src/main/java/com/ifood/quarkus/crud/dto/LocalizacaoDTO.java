@@ -1,9 +1,11 @@
 package com.ifood.quarkus.crud.dto;
 
+import java.math.BigDecimal;
+
 public class LocalizacaoDTO {
 
-	public Double latitude;
+	public BigDecimal latitude;
 
-	public Double longitude;
+	public BigDecimal longitude;
 
 }

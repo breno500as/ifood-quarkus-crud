@@ -81,7 +81,7 @@ public class PratoAPI {
 	@PUT
 	@Path("{id}")
 	@Transactional
-	public void atualizar(@PathParam("idRestaurante") Long idRestaurante, @PathParam("id") Long id,
+	public Response atualizar(@PathParam("idRestaurante") Long idRestaurante, @PathParam("id") Long id,
 			@Valid AtualizarPratoDTO dto) {
 		Optional<Restaurante> restauranteOp = Restaurante.findByIdOptional(idRestaurante);
 		if (restauranteOp.isEmpty()) {
@@ -97,12 +97,14 @@ public class PratoAPI {
 		Prato prato = pratoOp.get();
 	    pratoMapper.toPrato(dto, prato);
 		prato.persist();
+		
+		return Response.ok().build();
 	}
 
 	@DELETE
 	@Path("{id}")
 	@Transactional
-	public void delete(@PathParam("idRestaurante") Long idRestaurante, @PathParam("id") Long id) {
+	public Response delete(@PathParam("idRestaurante") Long idRestaurante, @PathParam("id") Long id) {
 		Optional<Restaurante> restauranteOp = Restaurante.findByIdOptional(idRestaurante);
 		if (restauranteOp.isEmpty()) {
 			throw new NotFoundException("Restaurante não existe");
@@ -113,6 +115,8 @@ public class PratoAPI {
 		pratoOp.ifPresentOrElse(Prato::delete, () -> {
 			throw new NotFoundException();
 		});
+		
+		return Response.noContent().build();
 	}
 
 }

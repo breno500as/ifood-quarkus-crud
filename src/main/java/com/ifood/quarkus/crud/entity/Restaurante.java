@@ -33,6 +33,6 @@ public class Restaurante extends PanacheEntityBase {
 
 	public String nome;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade =  CascadeType.ALL)
 	public Localizacao localizacao;
 }
