@@ -1,4 +1,4 @@
-package com.ifood.quarkus.crud;
+package com.ifood.quarkus.crud.test;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -25,7 +25,7 @@ import io.restassured.specification.RequestSpecification;
 @DBRider
 @DBUnit(caseSensitiveTableNames = false,caseInsensitiveStrategy = Orthography.LOWERCASE)
 @QuarkusTestResource(DatabaseLifecycle.class)
-public class RestauranteTest {
+public class RestauranteAPITest {
 	
 	private String token;
 

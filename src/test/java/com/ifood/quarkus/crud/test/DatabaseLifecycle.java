@@ -1,4 +1,4 @@
-package com.ifood.quarkus.crud;
+package com.ifood.quarkus.crud.test;
 
 import java.util.HashMap;
 import java.util.Map;
