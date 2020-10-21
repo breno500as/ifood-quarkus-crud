@@ -56,7 +56,7 @@ public class RestauranteAPI {
 
 	@Inject
 	@Channel("restaurantes")
-	Emitter<Restaurante> emitter;
+	private Emitter<Restaurante> emitter;
 
 	@GET
 	public List<RestauranteDTO> listAll() {
