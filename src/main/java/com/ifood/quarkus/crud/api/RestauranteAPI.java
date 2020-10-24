@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -22,6 +23,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.Claims;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -57,7 +61,16 @@ public class RestauranteAPI {
 	@Inject
 	@Channel("restaurantes")
 	private Emitter<Restaurante> emitter;
+	
+	@Inject
+	private JsonWebToken token;
 
+	@Claim(value = "preferred_username")
+	private String nomeProprietarioToken;
+	
+	@Claim(standard = Claims.sub)
+	private String sub;
+	
 	@GET
 	public List<RestauranteDTO> listAll() {
 		Stream<Restaurante> restaurantes = Restaurante.streamAll();
@@ -70,10 +83,9 @@ public class RestauranteAPI {
 	@APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ConstraintViolationResponse.class)))
 	public Response cria(@Valid AdicionarRestauranteDTO restauranteDTO) {
 		Restaurante r = this.restauranteMapper.toRestaurante(restauranteDTO);
+		r.proprietario = this.nomeProprietarioToken;
 		r.persist();
-
-		emitter.send(r);
-
+		this.emitter.send(r);
 		return Response.status(Status.CREATED).build();
 	}
 
@@ -87,16 +99,16 @@ public class RestauranteAPI {
 		}
 		Restaurante restaurante = restauranteOp.get();
 
-		// if (!restaurante.proprietario.equals(sub)) {
-		// throw new ForbiddenException();
-		// }
+		 if (!restaurante.proprietario.equals(this.nomeProprietarioToken)) {
+		 throw new ForbiddenException();
+		 }
 
 		// MapStruct: aqui passo a referencia para ser atualizada
-		restauranteMapper.toRestaurante(dto, restaurante);
+		this.restauranteMapper.toRestaurante(dto, restaurante);
 
 		restaurante.persist();
 		
-		 return Response.ok().build();
+		return Response.ok().build();
 	}
 
 	@DELETE
