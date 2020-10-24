@@ -63,13 +63,13 @@ public class RestauranteAPI {
 	private Emitter<Restaurante> emitter;
 	
 	@Inject
-	private JsonWebToken token;
+	private JsonWebToken token; // Objeto que representa o conteúdo do token (header / payload)
 
 	@Claim(value = "preferred_username")
-	private String nomeProprietarioToken;
+	private String nomeProprietarioToken; // String que representa o claim preferred_username do token (nome do usuário logado do token)
 	
 	@Claim(standard = Claims.sub)
-	private String sub;
+	private String sub;  // String que representa o claim subject do token (subject do usuário logado do token)
 	
 	@GET
 	public List<RestauranteDTO> listAll() {
