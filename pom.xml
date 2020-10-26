@@ -62,7 +62,7 @@
 		<dependency>
 			<groupId>com.approvaltests</groupId>
 			<artifactId>approvaltests</artifactId>
-			<version>4.0.2</version>
+			<version>9.3.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -95,6 +95,10 @@
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-smallrye-health</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-hibernate-orm-rest-data-panache</artifactId>
+		</dependency> 
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
