@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 
 public class AdicionarPratoDTO {
+	
 
 	@NotNull
 	public String nome;
